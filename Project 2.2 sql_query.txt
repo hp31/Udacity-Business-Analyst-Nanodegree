@@ -1,0 +1,58 @@
+
+SQL Query for Customers
+SELECT Customers.Country,
+       Products.ProductName,
+       SUM(OrderDetails.UnitPrice*OrderDetails.Quantity) AS TotalRev,
+       COUNT (*)AS num
+FROM Customers
+JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+JOIN Products ON Products.ProductID = OrderDetails.ProductID
+JOIN Suppliers ON Suppliers.SupplierID = Products.SupplierID
+GROUP BY Customers.Country
+ORDER BY TotalRev DESC
+LIMIT 10;
+
+SQL Query for Suppliers
+SELECT companyName,
+       SUM((unitsinstock+unitsonorder)*products.unitprice) AS Totalcost,
+       SUM(unitsinstock+unitsonorder) AS Totalunit
+FROM products
+JOIN Suppliers ON products.supplierid=suppliers.supplierid
+GROUP BY companyName
+ORDER BY Totalcost DESC
+LIMIT 10;
+
+SQL Query for Employees
+SELECT employees.employeeID,
+       LastName,
+       FirstName,
+       Title,
+       City,
+       sum(unitprice*quantity) AS Sales
+FROM OrderDetails
+JOIN orders ON OrderDetails.OrderID=Orders.orderid
+JOIN Employees ON orders.Employeeid=Employees.EmployeeID
+GROUP BY LastName
+ORDER BY Sales DESC;
+
+
+SQL Query for Total Sales
+
+SELECT Categories.categoryname,
+       SUM (orderdetails.unitprice * orderdetails.quantity) AS Totalsales,
+           strftime('%Y',OrderDate) AS YEAR
+FROM Categories
+JOIN Products ON Categories.CategoryID=Products.categoryID
+JOIN OrderDetails ON products.productID= OrderDetails.ProductID
+JOIN Orders ON OrderDetails.orderid= Orders.OrderId
+AND YEAR = '2016',
+
+  (SELECT SUM (OrderDetails.unitprice * OrderDetails.quantity) AS AnnualSales,
+              strftime('%Y',orderdate) AS yr
+   FROM Orders
+   JOIN OrderDetails ON OrderDetails.OrderID = orders.OrderId
+   AND yr ='2016'
+   GROUP BY yr) annual
+GROUP BY categoryname
+ORDER BY categoryname;
